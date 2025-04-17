@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Memo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <script src="theme-loader.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            overflow-x: hidden;
+            color: var(--text-primary);
+        }
+        
+        .privacy-page {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-primary);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .menu-icon, .home-icon {
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 28px;
+            padding: 12px;
+        }
+        
+        .menu-icon i, .home-icon i {
+            font-size: 28px;
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .page-title {
+            font-family: 'Press Start 2P', monospace;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            color: var(--text-primary);
+        }
+        
+        .privacy-container {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .privacy-container h2 {
+            color: var(--accent-color);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .privacy-container h3 {
+            color: var(--text-primary);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .privacy-container p {
+            margin-bottom: 15px;
+        }
+        
+        .privacy-container ul, .privacy-container ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .privacy-container li {
+            margin-bottom: 8px;
+        }
+        
+        .back-button {
+            align-self: center;
+            padding: 12px 24px;
+            border-radius: 30px;
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Overlay for sidebar menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Sidebar menu */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: var(--sidebar-bg);
+            z-index: 10;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h3 {
+            color: var(--accent-color);
+        }
+        
+        .sidebar-close {
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 20px;
+        }
+        
+        .sidebar-menu {
+            padding: 10px 0;
+        }
+        
+        .sidebar-item {
+            padding: 15px 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar-item:hover {
+            background-color: var(--bg-secondary);
+        }
+        
+        .sidebar-item i {
+            font-size: 20px;
+            color: var(--accent-color);
+            width: 24px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .privacy-container {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.2rem;
+            }
+            
+            .privacy-container h2 {
+                font-size: 1.3rem;
+            }
+            
+            .privacy-container h3 {
+                font-size: 1.1rem;
+            }
+            
+            .sidebar {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Privacy Policy Page -->
+    <div class="privacy-page">
+        <div class="header">
+            <div class="menu-icon" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+            <div class="home-icon" onclick="goToPage('index.html')"><i class="fas fa-home"></i></div>
+        </div>
+        <div class="content">
+            <h1 class="page-title">Privacy Policy</h1>
+            
+            <div class="privacy-container">
+                <p>Last updated: March 31, 2025</p>
+                
+                <p>This Privacy Policy describes how your personal information is collected, used, and shared when you use our Memo application ("the Application").</p>
+                
+                <h2>1. Information We Collect</h2>
+                
+                <p>When you use the Application, we collect certain information about you, including:</p>
+                
+                <h3>1.1. Personal Information</h3>
+                
+                <p>When you create an account, we collect:</p>
+                
+                <ul>
+                    <li>Your name</li>
+                    <li>Email address</li>
+                    <li>Password (stored in an encrypted format)</li>
+                </ul>
+                
+                <h3>1.2. Usage Information</h3>
+                
+                <p>As you use the Application, we collect information about:</p>
+                
+                <ul>
+                    <li>Flashcard decks you create</li>
+                    <li>Your study patterns and progress</li>
+                    <li>Performance statistics (cards learned, study time, etc.)</li>
+                </ul>
+                
+                <h3>1.3. Device Information</h3>
+                
+                <p>We may collect information about the device you use to access the Application, including:</p>
+                
+                <ul>
+                    <li>Browser type and version</li>
+                    <li>Operating system</li>
+                    <li>Screen resolution</li>
+                    <li>Time zone</li>
+                </ul>
+                
+                <h2>2. How We Use Your Information</h2>
+                
+                <p>We use the information we collect to:</p>
+                
+                <ul>
+                    <li>Provide, maintain, and improve the Application</li>
+                    <li>Create and manage your account</li>
+                    <li>Track your progress and provide personalized learning experiences</li>
+                    <li>Respond to your comments, questions, and requests</li>
+                    <li>Send you technical notices, updates, and administrative messages</li>
+                    <li>Detect, investigate, and prevent fraudulent transactions and other illegal activities</li>
+                </ul>
+                
+                <h2>3. Local Storage</h2>
+                
+                <p>The Application uses local storage on your device to store your account information, flashcard data, and application settings. This data is stored locally on your device and is not transmitted to our servers unless you explicitly choose to sync your data across devices (a feature that may be added in the future).</p>
+                
+                <h2>4. Data Security</h2>
+                
+                <p>We take reasonable measures to help protect your personal information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction. However, no security system is impenetrable, and we cannot guarantee the security of our systems with absolute certainty.</p>
+                
+                <h2>5. Data Retention</h2>
+                
+                <p>We store your personal information for as long as your account is active. If you delete your account, your personal information will be deleted from our systems, but your anonymized usage data may be retained for analytical purposes.</p>
+                
+                <h2>6. Your Rights</h2>
+                
+                <p>Depending on your location, you may have certain rights regarding your personal information, including:</p>
+                
+                <ul>
+                    <li>The right to access the personal information we hold about you</li>
+                    <li>The right to request that we correct or update your personal information</li>
+                    <li>The right to request that we delete your personal information</li>
+                    <li>The right to object to the processing of your personal information</li>
+                    <li>The right to data portability</li>
+                </ul>
+                
+                <p>To exercise any of these rights, please contact us using the information provided below.</p>
+                
+                <h2>7. Children's Privacy</h2>
+                
+                <p>The Application is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us immediately so that we can take steps to remove such information.</p>
+                
+                <h2>8. Changes to This Privacy Policy</h2>
+                
+                <p>We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We will notify you of any material changes by posting the new Privacy Policy on this page and updating the "Last updated" date.</p>
+                
+                <p>We encourage you to review this Privacy Policy periodically for any changes. Your continued use of the Application after the posting of changes constitutes your acceptance of such changes.</p>
+                
+                <h2>9. Third-Party Services</h2>
+                
+                <p>The Application may contain links to third-party websites or services. We are not responsible for the privacy practices of these third parties. We encourage you to read the privacy policies of any third-party websites or services that you visit.</p>
+                
+                <h2>10. Contact Us</h2>
+                
+                <p>If you have any questions about this Privacy Policy or our data practices, please contact us at:</p>
+                
+                <p><a href="mailto:mertcagatay4@gmail.com" style="color: var(--accent-color); text-decoration: none;">mertcagatay4@gmail.com</a></p>
+            </div>
+            
+            
+        </div>
+    </div>
+    
+    <!-- Sidebar and Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Memo</h3>
+            <div class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item" onclick="goToPage('index.html')">
+                <i class="fas fa-home"></i> Home
+            </div>
+            <div class="sidebar-item" onclick="goToPage('new-card.html')">
+                <i class="fas fa-plus"></i> New Deck
+            </div>
+            <div class="sidebar-item" onclick="goToPage('my-decks.html')">
+                <i class="fas fa-layer-group"></i> My Decks
+            </div>
+            <div class="sidebar-item" onclick="goToPage('about.html')">
+                <i class="fas fa-info-circle"></i> About
+            </div>
+            <div class="sidebar-item" onclick="goToPage('settings.html')">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+            <div class="sidebar-item" onclick="goToPage('account.html')">
+                <i class="fas fa-user"></i> Account
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                overlay.style.display = 'block';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                }, 10);
+            } else {
+                overlay.style.opacity = '0';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // Function to navigate to another page
+        function goToPage(url) {
+            window.location.href = url;
+        }
+    </script>
+    <script src="auth-check-optional.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Yapılandırma -->
+    <script>
+    // Firebase projenizin yapılandırması
+    const firebaseConfig = {
+        apiKey: "AIzaSyBa0oIiq9e-NFbn4-mhVTL6OQjBeNxFhcs",
+        authDomain: "memo-web-75603.firebaseapp.com",
+        projectId: "memo-web-75603",
+        storageBucket: "memo-web-75603.firebasestorage.app",
+        messagingSenderId: "962592461391",
+        appId: "1:962592461391:web:58cf3507582dc46fba903a",
+        measurementId: "G-BPJY5XR1TS"
+    };
+    
+    // Firebase'i başlat
+    firebase.initializeApp(firebaseConfig);
+    
+    // Auth ve Firestore referanslarını al
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Çevrimdışı veri desteğini etkinleştir
+    db.enablePersistence()
+        .then(() => {
+        console.log("Offline persistence enabled");
+        })
+        .catch((err) => {
+        if (err.code == 'failed-precondition') {
+            // Birden fazla sekme açıksa, persistence sadece bir sekmede etkinleştirilebilir
+            console.warn("Persistence failed: Multiple tabs open");
+        } else if (err.code == 'unimplemented') {
+            // Tarayıcı desteklemiyorsa
+            console.warn("Persistence not supported by browser");
+        }
+        });
+    </script>
+    <script src="firebase-auth.js"></script>
+</body>
+</html>

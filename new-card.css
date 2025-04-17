@@ -1,0 +1,356 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-primary);
+    overflow-x: hidden;
+    color: var(--text-primary);
+}
+
+.new-card-page {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-primary);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.menu-icon, .home-icon {
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 28px;
+    padding: 12px;
+}
+
+.menu-icon i, .home-icon i {
+    font-size: 28px;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.page-title {
+    font-family: 'Press Start 2P', monospace;
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+    color: var(--text-primary);
+}
+
+.card-section {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.section-label {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    color: var(--text-primary);
+}
+
+.section-label i {
+    margin-right: 10px;
+    color: var(--accent-color);
+}
+
+.card-input {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--bg-secondary);
+    border: none;
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 16px;
+    margin-bottom: 20px;
+    resize: none;
+    min-height: 100px;
+}
+
+.card-input:focus {
+    outline: 2px solid var(--accent-color);
+    background-color: var(--input-bg);
+}
+
+.card-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 20px 0;
+}
+
+.action-button {
+    padding: 12px 24px;
+    border-radius: 30px;
+    background-color: var(--accent-color);
+    color: var(--bg-primary);
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.action-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.action-button.previous {
+    background-color: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+}
+
+.navigation-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.card-counter {
+    text-align: center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+}
+
+.deck-info {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.deck-name {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--bg-secondary);
+    border: none;
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.deck-name:focus {
+    outline: 2px solid var(--accent-color);
+    background-color: var(--input-bg);
+}
+
+/* Overlay for sidebar menu */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Sidebar menu */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px !important;
+    width: 250px;
+    height: 100%;
+    background-color: var(--sidebar-bg);
+    z-index: 10;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar.active {
+    left: 0 !important;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    color: var(--accent-color);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.4rem;
+    padding: 10px 0;
+}
+
+.sidebar-close {
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.sidebar-menu {
+    padding: 10px 0;
+}
+
+.sidebar-item {
+    padding: 15px 20px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+}
+
+.sidebar-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.sidebar-item i {
+    font-size: 20px;
+    color: var(--accent-color);
+    width: 24px;
+    text-align: center;
+}
+
+.success-message {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 100;
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.2rem;
+    }
+    .sidebar {
+        left: -250px !important; /* Ekledim */
+    }
+    .card-input {
+        min-height: 80px;
+    }
+    
+    .buttons-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .navigation-buttons {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .action-button {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+    
+    /* Sidebar yazı fontları için mobil düzenlemeler */
+    .sidebar-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .sidebar-item {
+        font-size: 0.6rem;
+        padding: 12px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1rem;
+    }
+    
+    .section-label {
+        font-size: 1rem;
+    }
+    .sidebar {
+        left: -85% !important; /* Ekledim */
+    }
+    .sidebar {
+        width: 80%;
+    }
+    
+    /* Sidebar yazı fontları için daha küçük ekranlar */
+    .sidebar-header h3 {
+        font-size: 1rem;
+    }
+    
+    .sidebar-item {
+        font-size: 0.5rem;
+        padding: 10px 12px;
+    }
+    @media (max-width: 375px) {
+        .sidebar {
+            left: -90% !important; /* Ekledim */
+        }
+    }
+}
+/* Error message styles */
+.error-message {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f44336;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8rem;
+    max-width: 300px;
+    z-index: 1000;
+    display: none;
+    animation: fadeOut 5s forwards;
+    text-align: center;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}

@@ -1,0 +1,263 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-primary);
+    overflow-x: hidden;
+}
+
+.landing-page {
+    width: 100%;
+    height: 100vh;
+    background-color: var(--bg-primary);
+    overflow: hidden;
+    position: relative;
+}
+
+.header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.menu-icon, 
+.settings-icon {
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 28px;
+    padding: 12px;
+}
+
+.menu-icon i, 
+.settings-icon i {
+    font-size: 28px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 60px);
+    padding: 20px;
+    color: var(--text-primary);
+}
+
+.title {
+    color: var(--text-primary);
+    margin-bottom: 50px;
+    text-align: center;
+    font-size: 2rem;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.5;
+    /*text-transform: lowercase;*/
+}
+
+.button-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.action-button {
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 42px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 0 20px;
+}
+
+.action-button:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-5px);
+}
+
+/* Overlay for sidebar menu */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Sidebar menu */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px !important; /* !important ekledik küçük ekranlarda da gizli başlaması için */
+    width: 250px;
+    height: 100%;
+    background-color: var(--sidebar-bg);
+    z-index: 10;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar.active {
+    left: 0 !important; /* .active class'ı eklendiğinde göster */
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    color: var(--accent-color);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.4rem;
+    padding: 10px 0;
+}
+
+.sidebar-close {
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.sidebar-menu {
+    padding: 10px 0;
+}
+
+.sidebar-item {
+    padding: 15px 20px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+}
+
+.sidebar-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+.sidebar-item i {
+    font-size: 20px;
+    color: var(--accent-color);
+    width: 24px;
+    text-align: center;
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+    .title {
+        font-size: 1.5rem;
+    }
+    
+    .action-button {
+        width: 110px;
+        height: 110px;
+        font-size: 32px;
+    }
+    
+    /* Sidebar yazı fontları için mobil düzenlemeler */
+    .sidebar-header h3 {
+        font-size: 1.2rem;
+    }
+    
+    .sidebar-item {
+        font-size: 0.6rem;
+        padding: 12px 15px;
+    }
+    
+    .sidebar {
+        left: -250px !important; /* Mobil cihazlarda da kesinlikle gizli başlat */
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 1.2rem;
+    }
+    
+    .action-button {
+        width: 85px;
+        height: 85px;
+        font-size: 28px;
+    }
+    
+    .sidebar {
+        width: 85%; /* 80%'den 85%'e çıkarıldı */
+        left: -85% !important; /* Küçük ekranlar için genişliğe uygun olarak gizle */
+    }
+    
+    /* Sidebar yazı fontları için daha küçük ekranlar */
+    .sidebar-header h3 {
+        font-size: 1rem;
+    }
+    
+    .sidebar-item {
+        font-size: 0.55rem; /* 0.5'ten 0.55'e çıkarıldı */
+        padding: 12px 15px; /* 10px 12px'ten 12px 15px'e çıkarıldı */
+    }
+    
+    .sidebar-item i {
+        font-size: 18px; /* 20px'ten 18px'e düşürüldü - daha az alan kaplar */
+        margin-right: 2px; /* Sağ marjini azalttık */
+    }
+}
+
+/* iPhone SE ve küçük ekranlar için özel medya sorgusu */
+@media (max-width: 375px) {
+    .sidebar {
+        width: 90%; /* Daha küçük ekranlarda daha büyük sidebar */
+        left: -90% !important; /* Daha küçük ekranlar için genişliğe uygun olarak gizle */
+    }
+    
+    .sidebar-header h3 {
+        font-size: 1.1rem; /* Başlık boyutunu biraz büyüttük */
+        padding: 8px 0; /* Başlık padding'ini azalttık */
+    }
+    
+    .sidebar-item {
+        font-size: 0.65rem; /* Font boyutunu artırdık */
+        padding: 14px 12px; /* Daha fazla dikey padding, daha az yatay padding */
+        gap: 10px; /* İkon ile metin arasındaki boşluğu azalttık */
+    }
+    
+    .sidebar-item i {
+        font-size: 18px; /* İkon boyutunu sabit tuttuk */
+        width: 20px; /* İkonun kapladığı alanı azalttık */
+    }
+    
+    .action-button {
+        width: 80px; /* Butonları daha da küçülttük */
+        height: 80px;
+        font-size: 24px;
+        margin: 0 15px; /* Butonlar arası marjini azalttık */
+    }
+    
+    .button-container {
+        gap: 20px; /* Butonlar arası boşluğu azalttık */
+    }
+}

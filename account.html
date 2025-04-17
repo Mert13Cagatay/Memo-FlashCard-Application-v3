@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - Memo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <link rel="stylesheet" href="account.css">
+    <script src="theme-loader.js"></script>
+    <script src="auth-check.js"></script>
+</head>
+<body>
+    <!-- Account Page -->
+    <div class="account-page">
+        <div class="header">
+            <div class="menu-icon" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+            <div class="home-icon" onclick="goToPage('index.html')"><i class="fas fa-home"></i></div>
+        </div>
+        <div class="content">
+            <h1 class="page-title">Account</h1>
+            
+            <div class="user-info-container">
+                <div class="user-profile">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <h2 id="userName">Loading...</h2>
+                        <p id="userEmail">Loading...</p>
+                        <p id="memberSince">Member since: Loading...</p>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            
+            <div class="stats-container">
+                <h2 class="section-title">Your Statistics</h2>
+                
+                <div class="stats-summary">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDecks">0</div>
+                        <div class="stat-label">Decks Created</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCards">0</div>
+                        <div class="stat-label">Cards Created</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPractice">0</div>
+                        <div class="stat-label">Practice Sessions</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-history">
+                <h2 class="section-title">Practice History</h2>
+                
+                <div class="history-list" id="practiceHistory">
+                    <!-- Practice history will be loaded here -->
+                    <div class="empty-message">No practice sessions yet.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Message -->
+    <div id="successMessage" class="success-message">
+        Successfully logged out!
+    </div>
+    
+    <!-- Sidebar and Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Memo</h3>
+            <div class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item" onclick="goToPage('index.html')">
+                <i class="fas fa-home"></i> Home
+            </div>
+            <div class="sidebar-item" onclick="goToPage('new-card.html')">
+                <i class="fas fa-plus"></i> New Deck
+            </div>
+            <div class="sidebar-item" onclick="goToPage('my-decks.html')">
+                <i class="fas fa-layer-group"></i> My Decks
+            </div>
+            <div class="sidebar-item" onclick="goToPage('about.html')">
+                <i class="fas fa-info-circle"></i> About
+            </div>
+            <div class="sidebar-item" onclick="goToPage('settings.html')">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+            <div class="sidebar-item" onclick="goToPage('account.html')">
+                <i class="fas fa-user"></i> Account
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                overlay.style.display = 'block';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                }, 10);
+            } else {
+                overlay.style.opacity = '0';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // Function to navigate to another page
+        function goToPage(url) {
+            window.location.href = url;
+        }
+        
+        // Function to show success message
+        function showSuccessMessage(message) {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Function to show error message
+        function showErrorMessage(message) {
+            alert(message); // Basit bir hata mesajı gösterimi
+        }
+        
+        // Function to logout user - Firebase Authentication kullanarak değiştirildi
+        function logoutUser() {
+            // Firebase ile çıkış yap
+            auth.signOut()
+                .then(() => {
+                    // localStorage ve sessionStorage'dan kullanıcı bilgilerini temizle
+                    localStorage.removeItem('memo-current-user');
+                    sessionStorage.removeItem('memo-current-user');
+                    
+                    // Show success message
+                    showSuccessMessage('Successfully logged out!');
+                    
+                    // Redirect to login page after a short delay
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showErrorMessage('Çıkış yapılırken bir hata oluştu');
+                });
+        }
+        
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+        
+        // Function to load user data - Firebase Authentication kullanarak değiştirildi
+        function loadUserData() {
+            checkAuthState().then(userData => {
+                if (!userData) {
+                    // Redirect to login if no user found
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Display user information
+                document.getElementById('userName').textContent = userData.name || userData.username;
+                document.getElementById('userEmail').textContent = userData.email;
+                document.getElementById('memberSince').textContent = `Member since: ${formatDate(userData.createdAt)}`;
+            });
+        }
+        
+        // Function to load user statistics - Firebase Firestore kullanarak değiştirildi
+        function loadUserStats() {
+            checkAuthState().then(userData => {
+                if (!userData) return;
+                
+                // Bu kullanıcı için desteleri getir
+                fetchUserDecks(userData.id)
+                    .then(decks => {
+                        // Varsayılan desteleri filtrele (isimlerine göre)
+                        const defaultDeckNames = [
+                            "İngilizce B2 Seviye - 100 Kelime",
+                            "İngilizce A2 Seviye - 100 Kelime",
+                            "Türk Tarihi Önemli Olaylar - 50 Madde"
+                        ];
+                        
+                        // Sadece kullanıcının kendi oluşturduğu desteleri filtrele
+                        const userDecks = decks.filter(deck => 
+                            !defaultDeckNames.includes(deck.name)
+                        );
+                        
+                        // Count cards
+                        const totalCards = userDecks.reduce((total, deck) => total + deck.cards.length, 0);
+                        
+                        // Update statistics
+                        document.getElementById('totalDecks').textContent = userDecks.length;
+                        document.getElementById('totalCards').textContent = totalCards;
+                        
+                        // Pratik geçmişini getir
+                        return fetchPracticeHistory(userData.id);
+                    })
+                    .then(practiceHistory => {
+                        document.getElementById('totalPractice').textContent = practiceHistory.length;
+                        
+                        // Load practice history details
+                        loadPracticeHistory();
+                    })
+                    .catch(error => {
+                        console.error('Error loading user stats:', error);
+                    });
+            });
+        }
+        
+        // Function to load practice history - Firebase Firestore kullanarak değiştirildi
+        function loadPracticeHistory() {
+            checkAuthState().then(userData => {
+                if (!userData) return;
+                
+                // Firestore'dan pratik geçmişini getir
+                fetchPracticeHistory(userData.id)
+                    .then(practiceHistory => {
+                        const historyContainer = document.getElementById('practiceHistory');
+                        
+                        // Clear container
+                        historyContainer.innerHTML = '';
+                        
+                        // Check if there's any history
+                        if (practiceHistory.length === 0) {
+                            historyContainer.innerHTML = '<div class="empty-message">No practice sessions yet.</div>';
+                            return;
+                        }
+                        
+                        // Load decks information for reference
+                        fetchUserDecks(userData.id)
+                            .then(decks => {
+                                // Sort by date (newest first)
+                                practiceHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+                                
+                                // Create history items
+                                practiceHistory.forEach(session => {
+                                    const deck = decks.find(d => d.id === session.deckId) || { name: 'Unknown Deck' };
+                                    
+                                    const historyItem = document.createElement('div');
+                                    historyItem.className = 'history-item';
+                                    
+                                    const score = Math.round((session.correctAnswers / session.totalCards) * 100);
+                                    
+                                    historyItem.innerHTML = `
+                                        <div class="history-date">${formatDate(session.date)}</div>
+                                        <div class="history-details">
+                                            <h3>${deck.name}</h3>
+                                            <div class="history-stats">
+                                                <div class="history-stat">
+                                                    <span class="label">Score:</span>
+                                                    <span class="value">${score}%</span>
+                                                </div>
+                                                <div class="history-stat">
+                                                    <span class="label">Correct:</span>
+                                                    <span class="value">${session.correctAnswers}/${session.totalCards}</span>
+                                                </div>
+                                                <div class="history-stat">
+                                                    <span class="label">Time:</span>
+                                                    <span class="value">${session.timeSpent || 'N/A'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                    
+                                    historyContainer.appendChild(historyItem);
+                                });
+                            });
+                    })
+                    .catch(error => {
+                        console.error('Error loading practice history:', error);
+                        document.getElementById('practiceHistory').innerHTML = 
+                            '<div class="empty-message">Error loading practice history.</div>';
+                    });
+            });
+        }
+        
+        // Load data when page loads
+        window.onload = function() {
+            loadUserData();
+            loadUserStats();
+        };
+    </script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Yapılandırma -->
+    <script>
+    // Firebase projenizin yapılandırması
+    const firebaseConfig = {
+        apiKey: "AIzaSyBa0oIiq9e-NFbn4-mhVTL6OQjBeNxFhcs",
+        authDomain: "memo-web-75603.firebaseapp.com",
+        projectId: "memo-web-75603",
+        storageBucket: "memo-web-75603.firebasestorage.app",
+        messagingSenderId: "962592461391",
+        appId: "1:962592461391:web:58cf3507582dc46fba903a",
+        measurementId: "G-BPJY5XR1TS"
+    };
+    
+    // Firebase'i başlat
+    firebase.initializeApp(firebaseConfig);
+    
+    // Auth ve Firestore referanslarını al
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Çevrimdışı veri desteğini etkinleştir
+    db.enablePersistence()
+        .then(() => {
+        console.log("Offline persistence enabled");
+        })
+        .catch((err) => {
+        if (err.code == 'failed-precondition') {
+            // Birden fazla sekme açıksa, persistence sadece bir sekmede etkinleştirilebilir
+            console.warn("Persistence failed: Multiple tabs open");
+        } else if (err.code == 'unimplemented') {
+            // Tarayıcı desteklemiyorsa
+            console.warn("Persistence not supported by browser");
+        }
+        });
+    </script>
+    
+    <!-- Firebase Auth ve Decks dosyalarını dahil et -->
+    <script src="firebase-auth.js"></script>
+    <script src="firebase-decks.js"></script>
+</body>
+</html>

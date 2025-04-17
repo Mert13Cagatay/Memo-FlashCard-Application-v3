@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorize - Flashcard App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <link rel="stylesheet" href="./style.css"/>
+    <style>
+        /* Başlık için boyut artışı */
+        .title {
+            font-size: 2.5rem !important; /* Orjinal 2rem'i büyütüyoruz */
+            margin-bottom: 70px !important; /* Daha fazla boşluk */
+        }
+        
+        /* Butonlar için boyut artışı */
+        .action-button {
+            width: 180px !important; /* Orjinal 140px'i büyütüyoruz */
+            height: 180px !important; /* Orjinal 140px'i büyütüyoruz */
+            font-size: 52px !important; /* Orjinal 42px'i büyütüyoruz */
+        }
+        
+        /* Animasyon için ek CSS kodları */
+        .title span {
+            opacity: 0;
+            display: inline-block;
+            animation: letter-fade-in 0.15s ease forwards;
+            font-family: 'Press Start 2P', monospace; /* Font'u koruyoruz */
+        }
+
+        /* Boşluklar için özel stil */
+        .title .space {
+            width: 0.5em; /* Boşluk genişliği */
+        }
+        
+        /* Buton animasyonları */
+        .action-button {
+            opacity: 0;
+            animation: button-fade-in 0.5s ease forwards;
+        }
+        
+        .action-button:nth-child(1) {
+            animation-delay: 1.8s; /* İlk buton için gecikme */
+        }
+        
+        .action-button:nth-child(2) {
+            animation-delay: 2.1s; /* İkinci buton için gecikme */
+        }
+
+        @keyframes letter-fade-in {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+                color: var(--accent-color);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+                color: var(--text-primary);
+            }
+        }
+        
+        @keyframes button-fade-in {
+            from { 
+                opacity: 0; 
+                transform: translateY(50px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        /* Mobil için medya sorguları güncelleme */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem !important; /* Mobil için daha küçük */
+            }
+            
+            .action-button {
+                width: 140px !important;
+                height: 140px !important;
+                font-size: 42px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.5rem !important; /* Daha küçük ekranlar için daha küçük */
+            }
+            
+            .action-button {
+                width: 100px !important;
+                height: 100px !important;
+                font-size: 36px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div class="landing-page">
+        <div class="header">
+            <div class="menu-icon" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+            <div class="settings-icon" onclick="goToPage('settings.html')"><i class="fas fa-cog"></i></div>
+        </div>
+        <div class="content">
+            <h2 class="title" id="animated-title">Easiest way to memorize</h2>
+            <div class="button-container">
+                <div class="action-button" onclick="goToPage('new-card.html')">+</div>
+                <div class="action-button" onclick="goToPage('my-decks.html')">→</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar and Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Memo</h3>
+            <div class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item" onclick="goToPage('index.html')">
+                <i class="fas fa-home"></i> Home
+            </div>
+            <div class="sidebar-item" onclick="goToPage('new-card.html')">
+                <i class="fas fa-plus"></i> New Deck
+            </div>
+            <div class="sidebar-item" onclick="goToPage('my-decks.html')">
+                <i class="fas fa-layer-group"></i> My Decks
+            </div>
+            <div class="sidebar-item" onclick="goToPage('about.html')">
+                <i class="fas fa-info-circle"></i> About
+            </div>
+            <div class="sidebar-item" onclick="goToPage('settings.html')">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+            <div class="sidebar-item" onclick="goToPage('account.html')">
+                <i class="fas fa-user"></i> Account
+            </div>
+        </div>
+    </div>
+    <script src="modalLoader.js"></script>
+    <script>
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                overlay.style.display = 'block';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                }, 10);
+            } else {
+                overlay.style.opacity = '0';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Function to navigate to another page
+        function goToPage(url) {
+            window.location.href = url;
+        }
+        
+        // Title animation function
+        function animateTitle() {
+            const titleElement = document.getElementById('animated-title');
+            const text = titleElement.textContent;
+            
+            // Clear the original text
+            titleElement.textContent = '';
+            
+            // Create a span for each character and add animation delay
+            for (let i = 0; i < text.length; i++) {
+                const charSpan = document.createElement('span');
+                
+                // Boşluklar için özel işlem
+                if (text[i] === ' ') {
+                    charSpan.textContent = ' ';
+                    charSpan.className = 'space';
+                } else {
+                    charSpan.textContent = text[i];
+                }
+                
+                charSpan.style.animationDelay = `${i * 0.1}s`;
+                titleElement.appendChild(charSpan);
+            }
+        }
+        
+        // Run the animation when page loads
+        window.onload = function() {
+            animateTitle();
+        };
+    </script>
+    <script src="theme-loader.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Yapılandırma -->
+    <script>
+    // Firebase projenizin yapılandırması
+    const firebaseConfig = {
+        apiKey: "AIzaSyBa0oIiq9e-NFbn4-mhVTL6OQjBeNxFhcs",
+        authDomain: "memo-web-75603.firebaseapp.com",
+        projectId: "memo-web-75603",
+        storageBucket: "memo-web-75603.firebasestorage.app",
+        messagingSenderId: "962592461391",
+        appId: "1:962592461391:web:58cf3507582dc46fba903a",
+        measurementId: "G-BPJY5XR1TS"
+    };
+    
+    // Firebase'i başlat
+    firebase.initializeApp(firebaseConfig);
+    
+    // Auth ve Firestore referanslarını al
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Çevrimdışı veri desteğini etkinleştir
+    db.enablePersistence()
+        .then(() => {
+        console.log("Offline persistence enabled");
+        })
+        .catch((err) => {
+        if (err.code == 'failed-precondition') {
+            // Birden fazla sekme açıksa, persistence sadece bir sekmede etkinleştirilebilir
+            console.warn("Persistence failed: Multiple tabs open");
+        } else if (err.code == 'unimplemented') {
+            // Tarayıcı desteklemiyorsa
+            console.warn("Persistence not supported by browser");
+        }
+        });
+    </script>
+    <script src="firebase-auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Sign Up - Memo</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+   <script src="theme-loader.js"></script>
+   <style>
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+       }
+       
+       body {
+           background-color: var(--bg-primary);
+           overflow-x: hidden;
+           color: var(--text-primary);
+       }
+       
+       .signup-page {
+           width: 100%;
+           min-height: 100vh;
+           background-color: var(--bg-primary);
+           position: relative;
+           display: flex;
+           flex-direction: column;
+       }
+       
+       .header {
+           padding: 15px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           width: 100%;
+       }
+       
+       .menu-icon, .home-icon {
+           color: var(--text-primary);
+           cursor: pointer;
+           font-size: 28px;
+           padding: 12px;
+       }
+       
+       .menu-icon i, .home-icon i {
+           font-size: 28px;
+       }
+       
+       .content {
+           flex: 1;
+           display: flex;
+           flex-direction: column;
+           align-items: center;
+           justify-content: center;
+           padding: 20px;
+           width: 100%;
+       }
+       
+       .page-title {
+           font-family: 'Press Start 2P', monospace;
+           text-align: center;
+           font-size: 1.8rem;
+           margin-bottom: 40px;
+           color: var(--text-primary);
+       }
+       
+       .signup-form {
+           width: 100%;
+           max-width: 400px;
+           background-color: var(--bg-secondary);
+           padding: 30px;
+           border-radius: 10px;
+           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+       }
+       
+       .form-group {
+           margin-bottom: 20px;
+       }
+       
+       .form-group label {
+           display: block;
+           margin-bottom: 8px;
+           font-weight: bold;
+           color: var(--text-primary);
+       }
+       
+       .form-group input {
+           width: 100%;
+           padding: 12px 15px;
+           background-color: var(--input-bg);
+           border: 1px solid var(--border-color);
+           border-radius: 5px;
+           color: var(--text-primary);
+           font-size: 16px;
+       }
+       
+       .form-group input:focus {
+           outline: 2px solid var(--accent-color);
+           border-color: var(--accent-color);
+       }
+       
+       .terms {
+           display: flex;
+           align-items: flex-start;
+           margin-bottom: 20px;
+       }
+       
+       .terms input {
+           margin-right: 10px;
+           margin-top: 4px;
+       }
+       
+       .btn-signup {
+           width: 100%;
+           padding: 12px;
+           background-color: var(--accent-color);
+           color: var(--bg-primary);
+           border: none;
+           border-radius: 5px;
+           font-size: 16px;
+           font-weight: bold;
+           cursor: pointer;
+           transition: all 0.2s;
+       }
+       
+       .btn-signup:hover {
+           transform: translateY(-3px);
+           box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+       }
+       
+       .links {
+           margin-top: 20px;
+           text-align: center;
+       }
+       
+       .links a {
+           color: var(--accent-color);
+           text-decoration: none;
+           font-size: 14px;
+       }
+       
+       .links a:hover {
+           text-decoration: underline;
+       }
+       
+       .error-message {
+           position: fixed;
+           bottom: 20px;
+           right: 20px;
+           background-color: #f44336;
+           color: white;
+           padding: 15px 20px;
+           border-radius: 5px;
+           box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+           font-family: 'Press Start 2P', monospace;
+           font-size: 0.8rem;
+           max-width: 300px;
+           z-index: 1000;
+           display: none;
+           animation: fadeOut 5s forwards;
+           text-align: center;
+       }
+       
+       @keyframes fadeOut {
+           0% { opacity: 1; }
+           80% { opacity: 1; }
+           100% { opacity: 0; }
+       }
+       
+       /* Overlay for sidebar menu */
+       .overlay {
+           display: none;
+           position: fixed;
+           top: 0;
+           left: 0;
+           right: 0;
+           bottom: 0;
+           background-color: rgba(0, 0, 0, 0.5);
+           z-index: 9;
+           opacity: 0;
+           transition: opacity 0.3s ease;
+       }
+       
+       /* Sidebar menu */
+       .sidebar {
+           position: fixed;
+           top: 0;
+           left: -250px;
+           width: 250px;
+           height: 100%;
+           background-color: var(--sidebar-bg);
+           z-index: 10;
+           transition: left 0.3s ease;
+           box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+           overflow-y: auto;
+           border-right: 1px solid var(--border-color);
+       }
+       
+       .sidebar.active {
+           left: 0;
+       }
+       
+       .sidebar-header {
+           padding: 20px;
+           border-bottom: 1px solid var(--border-color);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+       
+       .sidebar-header h3 {
+           color: var(--accent-color);
+       }
+       
+       .sidebar-close {
+           color: var(--text-primary);
+           cursor: pointer;
+           font-size: 20px;
+       }
+       
+       .sidebar-menu {
+           padding: 10px 0;
+       }
+       
+       .sidebar-item {
+           padding: 15px 20px;
+           color: var(--text-primary);
+           display: flex;
+           align-items: center;
+           gap: 15px;
+           cursor: pointer;
+           transition: background-color 0.2s;
+       }
+       
+       .sidebar-item:hover {
+           background-color: var(--bg-secondary);
+       }
+       
+       .sidebar-item i {
+           font-size: 20px;
+           color: var(--accent-color);
+           width: 24px;
+           text-align: center;
+       }
+       
+       @media (max-width: 480px) {
+           .signup-form {
+               padding: 20px;
+           }
+           
+           .page-title {
+               font-size: 1.5rem;
+               margin-bottom: 30px;
+           }
+       }
+   </style>
+</head>
+<body>
+   <!-- Signup Page -->
+   <div class="signup-page">
+       <div class="header">
+           <div class="menu-icon" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+           <div class="home-icon" onclick="goToPage('index.html')"><i class="fas fa-home"></i></div>
+       </div>
+       <div class="content">
+           <h1 class="page-title">Sign Up</h1>
+           
+           <form class="signup-form" id="signupForm">
+               <div class="form-group">
+                   <label for="name">Full Name</label>
+                   <input type="text" id="name" name="name" required>
+               </div>
+               
+               <div class="form-group">
+                   <label for="email">Email</label>
+                   <input type="email" id="email" name="email" required>
+               </div>
+               
+               <div class="form-group">
+                   <label for="password">Password</label>
+                   <input type="password" id="password" name="password" required>
+               </div>
+               
+               <div class="form-group">
+                   <label for="confirmPassword">Confirm Password</label>
+                   <input type="password" id="confirmPassword" name="confirmPassword" required>
+               </div>
+               
+               <div class="terms">
+                   <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                   <label for="agreeTerms">I agree to the <a href="terms-and-conditions.html" target="_blank" style="color: var(--accent-color);">Terms and Conditions</a> and <a href="privacy-policy.html" target="_blank" style="color: var(--accent-color);">Privacy Policy</a></label>
+               </div>
+               
+               <button type="submit" class="btn-signup">Create Account</button>
+               
+               <div class="links">
+                   <a href="login.html">Already have an account? Login</a>
+               </div>
+           </form>
+       </div>
+   </div>
+   
+   <!-- Error Message -->
+   <div id="errorMessage" class="error-message">
+       Error message will appear here
+   </div>
+   
+   <!-- Sidebar and Overlay -->
+   <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+   <div class="sidebar" id="sidebar">
+       <div class="sidebar-header">
+           <h3>Memo</h3>
+           <div class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
+       </div>
+       <div class="sidebar-menu">
+           <div class="sidebar-item" onclick="goToPage('index.html')">
+               <i class="fas fa-home"></i> Home
+           </div>
+           <div class="sidebar-item" onclick="goToPage('new-card.html')">
+               <i class="fas fa-plus"></i> New Deck
+           </div>
+           <div class="sidebar-item" onclick="goToPage('my-decks.html')">
+               <i class="fas fa-layer-group"></i> My Decks
+           </div>
+           <div class="sidebar-item" onclick="goToPage('about.html')">
+               <i class="fas fa-info-circle"></i> About
+           </div>
+           <div class="sidebar-item" onclick="goToPage('settings.html')">
+               <i class="fas fa-cog"></i> Settings
+           </div>
+           <div class="sidebar-item" onclick="goToPage('account.html')">
+               <i class="fas fa-user"></i> Account
+           </div>
+       </div>
+   </div>
+   
+   <script>
+       // Function to show error message
+       function showErrorMessage(message) {
+           const errorMessage = document.getElementById('errorMessage');
+           errorMessage.textContent = message;
+           errorMessage.style.display = 'block';
+           errorMessage.style.opacity = '1';
+           errorMessage.style.animation = 'none';
+           
+           // Reset animation
+           setTimeout(() => {
+               errorMessage.style.animation = 'fadeOut 5s forwards';
+           }, 10);
+           
+           // Hide after animation
+           setTimeout(() => {
+               errorMessage.style.display = 'none';
+           }, 5000);
+       }
+       
+       // Function to toggle sidebar
+       function toggleSidebar() {
+           const sidebar = document.getElementById('sidebar');
+           const overlay = document.getElementById('overlay');
+           
+           sidebar.classList.toggle('active');
+           
+           if (sidebar.classList.contains('active')) {
+               overlay.style.display = 'block';
+               // Add small delay for smooth transition
+               setTimeout(() => {
+                   overlay.style.opacity = '1';
+               }, 10);
+           } else {
+               overlay.style.opacity = '0';
+               // Add small delay for smooth transition
+               setTimeout(() => {
+                   overlay.style.display = 'none';
+               }, 300);
+           }
+       }
+       
+       // Function to navigate to another page
+       function goToPage(url) {
+           window.location.href = url;
+       }
+       
+       // Function to handle signup - Firebase Authentication ile değiştirildi
+       document.getElementById('signupForm').addEventListener('submit', function(e) {
+           e.preventDefault();
+           
+           const name = document.getElementById('name').value;
+           const email = document.getElementById('email').value;
+           const password = document.getElementById('password').value;
+           const confirmPassword = document.getElementById('confirmPassword').value;
+           const agreeTerms = document.getElementById('agreeTerms').checked;
+           
+           // Validate input
+           if (password !== confirmPassword) {
+               showErrorMessage('Şifreler eşleşmiyor. Lütfen tekrar deneyin.');
+               return;
+           }
+           
+           if (password.length < 6) {
+               showErrorMessage('Şifreniz en az 6 karakter uzunluğunda olmalıdır.');
+               return;
+           }
+           
+           if (!agreeTerms) {
+               showErrorMessage('Şartlar ve koşulları kabul etmelisiniz.');
+               return;
+           }
+           
+           // Firebase ile kullanıcı kaydı
+           registerUser(email, password, name)
+               .then(userData => {
+                   // Varsayılan desteler ekle
+                   return addDefaultDecksToNewUser(userData.id);
+               })
+               .then(() => {
+                   // Başarılı kayıt, ana sayfaya yönlendir
+                   window.location.href = 'my-decks.html';
+               })
+               .catch(error => {
+                   // Hata mesajını göster
+                   showErrorMessage('Kayıt hatası: ' + error.message);
+               });
+       });
+       
+       // Check if user is already logged in - Firebase Authentication kontrolüyle değiştirildi
+       window.onload = function() {
+           checkAuthState().then(user => {
+               if (user) {
+                   // User is already logged in, redirect to home
+                   window.location.href = 'my-decks.html';
+               }
+           });
+       };
+   </script>
+   
+   <!-- Firebase SDK -->
+   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+   <!-- Firebase Yapılandırma -->
+   <script>
+   // Firebase projenizin yapılandırması
+   const firebaseConfig = {
+       apiKey: "AIzaSyBa0oIiq9e-NFbn4-mhVTL6OQjBeNxFhcs",
+       authDomain: "memo-web-75603.firebaseapp.com",
+       projectId: "memo-web-75603",
+       storageBucket: "memo-web-75603.firebasestorage.app",
+       messagingSenderId: "962592461391",
+       appId: "1:962592461391:web:58cf3507582dc46fba903a",
+       measurementId: "G-BPJY5XR1TS"
+   };
+   
+   // Firebase'i başlat
+   firebase.initializeApp(firebaseConfig);
+   
+   // Auth ve Firestore referanslarını al
+   const auth = firebase.auth();
+   const db = firebase.firestore();
+   
+   // Çevrimdışı veri desteğini etkinleştir
+   db.enablePersistence()
+       .then(() => {
+       console.log("Offline persistence enabled");
+       })
+       .catch((err) => {
+       if (err.code == 'failed-precondition') {
+           // Birden fazla sekme açıksa, persistence sadece bir sekmede etkinleştirilebilir
+           console.warn("Persistence failed: Multiple tabs open");
+       } else if (err.code == 'unimplemented') {
+           // Tarayıcı desteklemiyorsa
+           console.warn("Persistence not supported by browser");
+       }
+       });
+   </script>
+   
+   <!-- firebase-auth.js dosyasını dahil et -->
+   <script src="firebase-auth.js"></script>
+   
+   <!-- default-decks.js dosyasını dahil et (default desteler için) -->
+   <script src="default-decks.js"></script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memo - Hoşgeldiniz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .welcome-modal {
+            width: 90%;
+            max-width: 700px;
+            background-color: var(--bg-primary);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            color: var(--text-primary);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .pixel-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .subtitle {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .section-content {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .close-btn {
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto 10px;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .signature {
+            text-align: right;
+            margin-top: 20px;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .welcome-modal {
+                padding: 20px;
+                width: 95%;
+            }
+            
+            .pixel-title {
+                font-size: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <script src="theme-loader.js"></script>
+</head>
+<body>
+    <div class="welcome-modal">
+        <div class="modal-header">
+            <div class="pixel-title">MEMO</div>
+            <div class="subtitle">Kişisel Öğrenme Asistanınız</div>
+        </div>
+
+        <p>Merhabalar! Ben Mert, İTÜ Endüstri Mühendisliği 4. sınıf öğrencisiyim. Kodlama becerilerimi geliştirmek ve öğrenci arkadaşlarıma yardımcı olmak için "Memo" isimli bir flashcard uygulaması geliştirdim. Piyasadaki alternatiflerin hem ücretleri hem de kullanım zorlukları düşünüldüğünde, Memo'nun sizin için ideal bir çözüm olacağını umuyorum.</p>
+
+        <div class="section-title">NEDEN MEMO?</div>
+        <div class="section-content">
+            <ul>
+                <li><strong>Tamamen Ücretsiz:</strong> Hiçbir gizli ücret veya premium özellik yok</li>
+                <li><strong>Kullanıcı Dostu:</strong> Sezgisel arayüz, minimal tasarım</li>
+                <li><strong>Hızlı ve Verimli:</strong> Öğrenme sürecinizi hızlandırmak için tasarlandı</li>
+                <li><strong>Çevrimdışı Çalışır:</strong> İnternet bağlantısı olmadan da çalışabilir</li>
+                <li><strong>Gizlilik Odaklı:</strong> Verileriniz sadece sizin cihazınızda saklanır</li>
+            </ul>
+        </div>
+
+        <div class="section-title">KAPALI BETA TEST</div>
+        <div class="section-content">
+            <p>Uygulamanın ilk geri bildirimlerini toplamak için sizleri kapalı beta testine davet ediyorum. Geri bildirimleriniz, uygulamayı geliştirmem ve hataları düzeltmem için çok değerli olacak.</p>
+            
+            <p><strong>Geri Bildirim İçin Öneriler:</strong></p>
+            
+            <p><strong>Fonksiyonel Değerlendirme:</strong></p>
+            <ul>
+                <li>Tüm butonlar ve menüler doğru çalışıyor mu?</li>
+                <li>Deste oluşturma ve düzenleme sorunsuz işliyor mu?</li>
+                <li>Kartların ön ve arka yüzleri arasında geçiş yapabildiniz mi?</li>
+                <li>Herhangi bir çökme veya donma yaşadınız mı?</li>
+            </ul>
+            
+            <p><strong>Kullanıcı Deneyimi:</strong></p>
+            <ul>
+                <li>Uygulama ne kadar sezgisel? Kullanımı kolay mı?</li>
+                <li>Menüler arası geçiş yaparken zorlandığınız yerler var mı?</li>
+                <li>Tasarım veya gezinme konusunda iyileştirmeler önerir misiniz?</li>
+            </ul>
+            
+            <p><strong>Görsel Tasarım:</strong></p>
+            <ul>
+                <li>Renk şeması ve yazı tipleri gözünüze hoş geliyor mu?</li>
+                <li>Butonların ve öğelerin boyutu uygun mu?</li>
+                <li>Mobil cihazınızda tüm öğeler doğru görünüyor mu?</li>
+            </ul>
+            
+            <p><strong>Özellik İstekleri:</strong></p>
+            <ul>
+                <li>Eklenmesini istediğiniz özellikler var mı?</li>
+                <li>Mevcut özelliklerde değişiklik önerileriniz nelerdir?</li>
+            </ul>
+            
+            <p>Kapalı test olduğu için anonim geri bildirim alamıyorum. Lütfen tüm yorumlarınızı, önerilerinizi ve karşılaştığınız sorunları WhatsApp üzerinden bana doğrudan iletin.</p>
+        </div>
+
+        <div class="section-title">BAŞLARKEN</div>
+        <div class="section-content">
+            <ol>
+                <li><strong>Hesap Oluşturma:</strong> Denemeye başlamadan önce hesap oluşturmanız gerekiyor. Merak etmeyin, şifre veya e-posta bilgileriniz güvenli bir şekilde şifreleniyor ve sadece sizin erişiminize açık kalıyor.</li>
+                <li><strong>Desteler:</strong> İki seçeneğiniz var:
+                    <ul>
+                        <li>Hazır destelerden birini seçebilirsiniz (İngilizce B2/A2 seviyeleri veya Türk Tarihi)</li>
+                        <li>Kendi destenizi oluşturabilirsiniz (geri bildirim için kendi destenizi oluşturmanızı öneririm)</li>
+                    </ul>
+                </li>
+                <li><strong>Ana Sayfa:</strong> İki ana buton bulunuyor:
+                    <ul>
+                        <li>"+" butonu: Yeni deste oluşturmak için</li>
+                        <li>"→" butonu: Mevcut destelerinizi görüntülemek için</li>
+                    </ul>
+                </li>
+                <li><strong>Ayarlar:</strong> Görsel tercihlerinizi düzenleyebilirsiniz:
+                    <ul>
+                        <li>Yazı boyutunu ayarlama</li>
+                        <li>Koyu/açık tema seçenekleri</li>
+                        <li>Diğer görüntüleme tercihleri</li>
+                    </ul>
+                </li>
+                <li><strong>Hesap Sayfası:</strong> Öğrenme performansınızı takip edebilirsiniz:
+                    <ul>
+                        <li>Çalışma istatistikleriniz</li>
+                        <li>Doğru/yanlış oranlarınız</li>
+                        <li>Çalışma geçmişiniz</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="section-title">SINIRLAMALAR</div>
+        <div class="section-content">
+            <p>Bu beta sürümünde bazı özellikler henüz tam olarak geliştirilmemiş olabilir. Karşılaştığınız sorunları bildirmeniz, bu özellikleri geliştirmeme yardımcı olacaktır.</p>
+        </div>
+
+        <p class="signature">Memo'yu test ettiğiniz için şimdiden teşekkür ederim! Geri bildirimleriniz sayesinde daha iyi bir uygulama geliştireceğime inanıyorum. Herhangi bir sorunuz veya öneriniz varsa, lütfen bana WhatsApp üzerinden ulaşmaktan çekinmeyin.<br>İyi çalışmalar ve verimli öğrenmeler dilerim!<br>Mert</p>
+
+        <button class="close-btn" onclick="closeModal()">ANLADIM</button>
+    </div>
+
+    <script>
+        function closeModal() {
+            // Modal kapatma mesajını ana sayfaya gönder
+            window.parent.postMessage('closeModal', '*');
+        }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Yapılandırma -->
+    <script>
+    // Firebase projenizin yapılandırması
+    const firebaseConfig = {
+        apiKey: "AIzaSyBa0oIiq9e-NFbn4-mhVTL6OQjBeNxFhcs",
+        authDomain: "memo-web-75603.firebaseapp.com",
+        projectId: "memo-web-75603",
+        storageBucket: "memo-web-75603.firebasestorage.app",
+        messagingSenderId: "962592461391",
+        appId: "1:962592461391:web:58cf3507582dc46fba903a",
+        measurementId: "G-BPJY5XR1TS"
+    };
+    
+    // Firebase'i başlat
+    firebase.initializeApp(firebaseConfig);
+    
+    // Auth ve Firestore referanslarını al
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Çevrimdışı veri desteğini etkinleştir
+    db.enablePersistence()
+        .then(() => {
+        console.log("Offline persistence enabled");
+        })
+        .catch((err) => {
+        if (err.code == 'failed-precondition') {
+            // Birden fazla sekme açıksa, persistence sadece bir sekmede etkinleştirilebilir
+            console.warn("Persistence failed: Multiple tabs open");
+        } else if (err.code == 'unimplemented') {
+            // Tarayıcı desteklemiyorsa
+            console.warn("Persistence not supported by browser");
+        }
+        });
+    </script>
+    <script src="firebase-auth.js"></script>
+</body>
+</html>

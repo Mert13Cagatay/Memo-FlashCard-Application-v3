@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Decks - Memo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <link rel="stylesheet" href="./my-decks.css"/>
+</head>
+<body>
+    <!-- My Decks Page -->
+    <div class="my-decks-page">
+        <div class="header">
+            <div class="menu-icon" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+            <div class="home-icon" onclick="goToPage('index.html')"><i class="fas fa-home"></i></div>
+        </div>
+        <div class="content">
+            <h1 class="page-title">My Decks</h1>
+            
+            <!-- Ready-to-use Decks Section with Toggle Button -->
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-book"></i> Ready-to-use Decks
+                </h2>
+                <button id="toggleDefaultDecks" class="toggle-button" title="Show/Hide Ready-to-use Decks">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+            </div>
+            <div class="decks-container" id="defaultDecksContainer">
+                <!-- Default decks will be loaded here -->
+                <div class="no-decks-message">
+                    <p>Loading ready-to-use decks...</p>
+                </div>
+            </div>
+            <br>
+            <!-- User's Decks Section -->
+            <h2 class="section-title">
+                <i class="fas fa-layer-group"></i> My Created Decks
+            </h2>
+            <div class="decks-container" id="userDecksContainer">
+                <!-- User decks will be loaded here dynamically -->
+            </div>
+            
+            <div class="button-container">
+                <button class="create-deck-button" onclick="goToPage('new-card.html')">
+                    <i class="fas fa-plus"></i> Create New Deck
+                </button>
+                <button class="import-deck-button" onclick="showImportDialog()">
+                    <i class="fas fa-file-import"></i> Import Deck
+                </button>
+            </div>
+            </div>
+            </div>
+        
+            
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Dialog -->
+    <div class="dialog-overlay" id="dialogOverlay">
+        <div class="dialog-box">
+            <div class="dialog-title">Delete Deck</div>
+            <div class="dialog-message" id="dialogMessage">Are you sure you want to delete this deck?</div>
+            <div class="dialog-buttons">
+                <button class="dialog-button cancel" onclick="closeDialog()">Cancel</button>
+                <button class="dialog-button confirm" id="confirmButton">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+        <!-- Import Dialog HTML -->
+    <div class="dialog-overlay" id="importDialogOverlay">
+        <div class="dialog-box import-dialog">
+            <div class="dialog-title">Import Flashcards</div>
+            <div class="dialog-message">
+                <p>Upload a text file with your flashcards.</p>
+                <p>We support tab-separated (#separator:tab) or line-separated flashcards.</p>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".txt">
+                    <div class="file-format-selector">
+                        <label>File format:</label>
+                        <select id="fileFormatSelect">
+                            <option value="auto">Auto-detect</option>
+                            <option value="tab">Tab separated</option>
+                            <option value="line">Line separated (front/back alternating)</option>
+                            <option value="colon">Colon separated (front:back)</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="importPreviewContainer" class="import-preview-container" style="display: none;">
+                    <h4>Preview:</h4>
+                    <div id="importPreview" class="import-preview"></div>
+                    <div class="preview-stats">
+                        <span id="previewCardCount">0</span> cards found
+                    </div>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-button cancel" onclick="closeImportDialog()">Cancel</button>
+                <button class="dialog-button" id="previewButton" onclick="previewImport()">Preview</button>
+                <button class="dialog-button confirm" id="importButton" onclick="importFlashcards()" disabled>Import</button>
+            </div>
+        </div>
+    </div>
+    <!-- Sidebar and Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <div class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item" onclick="goToPage('index.html')">
+                <i class="fas fa-home"></i> Home
+            </div>
+            <div class="sidebar-item" onclick="goToPage('new-card.html')">
+                <i class="fas fa-plus"></i> New Deck
+            </div>
+            <div class="sidebar-item" onclick="goToPage('my-decks.html')">
+                <i class="fas fa-layer-group"></i> My Decks
+            </div>
+            <div class="sidebar-item" onclick="goToPage('about.html')">
+                <i class="fas fa-info-circle"></i> About
+            </div>
+            <div class="sidebar-item" onclick="goToPage('settings.html')">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+            <div class="sidebar-item" onclick="goToPage('account.html')">
+                <i class="fas fa-user"></i> Account
+            </div>
+        </div>
+    </div>
+    
+    <script src="theme-loader.js"></script>
+    <script src="default-decks.js"></script>
+    <script src="auth-check.js"></script>
+    
+    <script>
+        // Global user variable
+        let currentUser = null;
+        
+        // Load decks from Firestore and localStorage
+        function loadDecks() {
+            checkAuthState().then(userData => {
+                if (userData) {
+                    currentUser = userData;
+                    loadDefaultDecks();
+                    loadUserDecks();
+                    setupToggleButton();
+                } else {
+                    // Redirect to login if not logged in
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+        
+        // Setup toggle button for default decks
+        function setupToggleButton() {
+            const toggleButton = document.getElementById('toggleDefaultDecks');
+            const defaultDecksContainer = document.getElementById('defaultDecksContainer');
+            
+            // Check if there's a stored preference
+            const isHidden = localStorage.getItem('memo-default-decks-hidden') === 'true';
+            
+            // Apply initial state
+            if (isHidden) {
+                defaultDecksContainer.classList.add('hidden');
+                toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                toggleButton.setAttribute('title', 'Show Ready-to-use Decks');
+            }
+            
+            // Set up click event
+            toggleButton.addEventListener('click', function() {
+                const isCurrentlyHidden = defaultDecksContainer.classList.contains('hidden');
+                
+                // Toggle visibility
+                if (isCurrentlyHidden) {
+                    defaultDecksContainer.classList.remove('hidden');
+                    toggleButton.innerHTML = '<i class="fas fa-chevron-up"></i>';
+                    toggleButton.setAttribute('title', 'Hide Ready-to-use Decks');
+                    localStorage.setItem('memo-default-decks-hidden', 'false');
+                } else {
+                    defaultDecksContainer.classList.add('hidden');
+                    toggleButton.innerHTML = '<i class="fas fa-chevron-down"></i>';
+                    toggleButton.setAttribute('title', 'Show Ready-to-use Decks');
+                    localStorage.setItem('memo-default-decks-hidden', 'true');
+                }
+            });
+        }
+        
+        // Get best practice score for a deck (in percentage)
+        function getBestScore(deckId) {
+            return new Promise(resolve => {
+                if (!currentUser) {
+                    resolve(null);
+                    return;
+                }
+                
+                // Try to get from Firebase first
+                db.collection('practice-history')
+                    .where('userId', '==', currentUser.id)
+                    .where('deckId', '==', deckId)
+                    .get()
+                    .then((querySnapshot) => {
+                        if (querySnapshot.empty) {
+                            // Fall back to localStorage if no data found in Firebase
+                            const practiceHistory = JSON.parse(localStorage.getItem(`memo-practice-history-${currentUser.id}`)) || [];
+                            const deckSessions = practiceHistory.filter(session => session.deckId === deckId);
+                            
+                            if (deckSessions.length === 0) {
+                                resolve(null); // No practice sessions found
+                                return;
+                            }
+                            
+                            // Calculate percentage scores for all sessions
+                            const percentages = deckSessions.map(session => {
+                                return Math.round((session.correctAnswers / session.totalCards) * 100);
+                            });
+                            
+                            // Return the highest percentage
+                            resolve(Math.max(...percentages));
+                        } else {
+                            // Calculate from Firebase data
+                            const sessions = [];
+                            querySnapshot.forEach(doc => {
+                                sessions.push(doc.data());
+                            });
+                            
+                            // Calculate percentage scores for all sessions
+                            const percentages = sessions.map(session => {
+                                return Math.round((session.correctAnswers / session.totalCards) * 100);
+                            });
+                            
+                            // Return the highest percentage
+                            resolve(Math.max(...percentages));
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error getting practice history:", error);
+                        resolve(null);
+                    });
+            });
+        }
+        
+        // Load default/ready-to-use decks
+        function loadDefaultDecks() {
+            const defaultDecksContainer = document.getElementById('defaultDecksContainer');
+            const defaultDeckNames = [
+                "İngilizce B2 Seviye - 100 Kelime",
+                "İngilizce A2 Seviye - 100 Kelime",
+                "Türk Tarihi Önemli Olaylar - 50 Madde",
+                "İspanyolca A1 Seviye - 100 Kelime",
+                "Almanca A1 Seviye - 100 Kelime",
+                "Fransızca A1 Seviye - 100 Kelime",
+                "İtalyanca A1 Seviye - 100 Kelime"
+            ];
+            
+            // Clear container and show loading
+            defaultDecksContainer.innerHTML = '<div class="no-decks-message"><p>Loading ready-to-use decks...</p></div>';
+            
+            // Query Firestore for default decks
+            db.collection('decks')
+                .where('userId', '==', 'system-demo-decks')
+                .get()
+                .then((querySnapshot) => {
+                    const defaultDecks = [];
+                    const seenNames = new Set();
+                    
+                    querySnapshot.forEach((doc) => {
+                        const deck = doc.data();
+                        if (defaultDeckNames.includes(deck.name) && !seenNames.has(deck.name)) {
+                            defaultDecks.push(deck);
+                            seenNames.add(deck.name);
+                        }
+                    });
+                    
+                    // If no default decks found, create them
+                    if (defaultDecks.length === 0) {
+                        console.log("Creating default decks...");
+                        
+                        try {
+                            // Check if addDefaultDecksToNewUser is available
+                            if (typeof addDefaultDecksToNewUser === "function") {
+                                // Create default decks with a system user ID
+                                const systemUserId = 'system-demo-decks';
+                                return addDefaultDecksToNewUser(systemUserId)
+                                    .then(() => {
+                                        // Re-query after creating defaults
+                                        return db.collection('decks')
+                                            .where('userId', '==', 'system-demo-decks')
+                                            .get();
+                                    })
+                                    .then((newSnapshot) => {
+                                        const newDecks = [];
+                                        const newSeenNames = new Set();
+                                        
+                                        newSnapshot.forEach((doc) => {
+                                            const deck = doc.data();
+                                            if (defaultDeckNames.includes(deck.name) && !newSeenNames.has(deck.name)) {
+                                                newDecks.push(deck);
+                                                newSeenNames.add(deck.name);
+                                            }
+                                        });
+                                        
+                                        // Fallback to global defaultDecks if no decks found
+                                        if (newDecks.length === 0 && window.defaultDecks) {
+                                            return renderDefaultDecks(
+                                                window.defaultDecks.filter(deck => defaultDeckNames.includes(deck.name))
+                                            );
+                                        }
+                                        
+                                        return renderDefaultDecks(newDecks);
+                                    });
+                            } else {
+                                // Fallback to global defaultDecks if function not found
+                                if (window.defaultDecks) {
+                                    return renderDefaultDecks(
+                                        window.defaultDecks.filter(deck => defaultDeckNames.includes(deck.name))
+                                    );
+                                }
+                                
+                                console.error("No default decks available");
+                                defaultDecksContainer.innerHTML = `
+                                    <div class="no-decks-message">
+                                        <p>Error: Default decks could not be loaded.</p>
+                                    </div>
+                                `;
+                                return;
+                            }
+                        } catch (error) {
+                            console.error("Error creating default decks:", error);
+                            defaultDecksContainer.innerHTML = `
+                                <div class="no-decks-message">
+                                    <p>Error loading default decks: ${error.message}</p>
+                                </div>
+                            `;
+                            return;
+                        }
+                    }
+                    
+                    // Render default decks
+                    return renderDefaultDecks(defaultDecks);
+                })
+                .catch(error => {
+                    console.error("Error loading default decks from Firestore:", error);
+                    
+                    // Fallback to localStorage
+                    const allDecks = JSON.parse(localStorage.getItem('memo-decks')) || [];
+                    const uniqueDefaultDecks = [];
+                    const seenNames = new Set();
+                    
+                    // Tüm desteler içinden benzersiz isimli olanları seç
+                    for (const deck of allDecks) {
+                        if (defaultDeckNames.includes(deck.name) && !seenNames.has(deck.name)) {
+                            uniqueDefaultDecks.push(deck);
+                            seenNames.add(deck.name);
+                        }
+                    }
+
+                    // Fallback olarak global defaultDecks'i kullan
+                    if (uniqueDefaultDecks.length === 0 && window.defaultDecks) {
+                        uniqueDefaultDecks.push(...window.defaultDecks.filter(deck => defaultDeckNames.includes(deck.name)));
+                    }
+                    
+                    // Render default decks
+                    renderDefaultDecks(uniqueDefaultDecks);
+                });
+        }
+        
+        // Render default decks
+        function renderDefaultDecks(defaultDecks) {
+            const defaultDecksContainer = document.getElementById('defaultDecksContainer');
+            
+            // Clear container
+            defaultDecksContainer.innerHTML = '';
+            
+            // Check if we have default decks
+            if (defaultDecks.length === 0) {
+                defaultDecksContainer.innerHTML = `
+                    <div class="no-decks-message">
+                        <p>No ready-to-use decks found.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort decks by creation date (newest first)
+            defaultDecks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            // Create deck items
+            const renderPromises = defaultDecks.map(deck => {
+                return getBestScore(deck.id).then(bestScore => {
+                    const bestScoreHtml = bestScore !== null ? 
+                        `<div class="best-score">Best score: ${bestScore}%</div>` : 
+                        '';
+                    
+                    // Ensure cards array exists and is properly counted
+                    const cardCount = deck.cards && Array.isArray(deck.cards) ? deck.cards.length : 0;
+                    
+                    const deckElement = document.createElement('div');
+                    deckElement.className = 'deck-item';
+                    deckElement.innerHTML = `
+                        <div class="deck-header">
+                            <div class="deck-title">${deck.name}</div>
+                            <div class="deck-stats">
+                                <i class="fas fa-layer-group"></i> ${cardCount} cards
+                            </div>
+                        </div>
+                        <div class="deck-content">
+                            ${bestScoreHtml}
+                            <button class="deck-action-button action-play" onclick="playDeck('${deck.id}', '${encodeURIComponent(deck.name)}')">
+                                <i class="fas fa-play"></i> Play
+                            </button>
+                        </div>
+                    `;
+                    defaultDecksContainer.appendChild(deckElement);
+                });
+            });
+            
+            return Promise.all(renderPromises);
+        }
+        
+        // Load user-created decks
+        function loadUserDecks() {
+            if (!currentUser) return;
+            
+            const userDecksContainer = document.getElementById('userDecksContainer');
+            
+            // Show loading message
+            userDecksContainer.innerHTML = '<div class="no-decks-message"><p>Loading your decks...</p></div>';
+            
+            // Varsayılan desteleri filtrele (isimlerine göre)
+            const defaultDeckNames = [
+                "İngilizce B2 Seviye - 100 Kelime",
+                "İngilizce A2 Seviye - 100 Kelime",
+                "Türk Tarihi Önemli Olaylar - 50 Madde",
+                "İspanyolca A1 Seviye - 100 Kelime",
+                "Almanca A1 Seviye - 100 Kelime",
+                "Fransızca A1 Seviye - 100 Kelime",
+                "İtalyanca A1 Seviye - 100 Kelime"
+            ];
+            
+            // Query Firestore for user's decks
+            db.collection('decks')
+                .where('userId', '==', currentUser.id)
+                .get()
+                .then((querySnapshot) => {
+                    const userDecks = [];
+                    
+                    querySnapshot.forEach((doc) => {
+                        const deck = doc.data();
+                        if (!defaultDeckNames.includes(deck.name)) {
+                            userDecks.push(deck);
+                        }
+                    });
+                    
+                    // Clear container
+                    userDecksContainer.innerHTML = '';
+                    
+                    if (userDecks.length === 0) {
+                        // Display message when no decks exist
+                        userDecksContainer.innerHTML = `
+                            <div class="no-decks-message">
+                                <p>You don't have any created decks yet.</p>
+                                <p>Create your first deck to get started!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Sort decks by creation date (newest first)
+                    userDecks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    
+                    // Create deck items
+                    const renderPromises = userDecks.map(deck => {
+                        return getBestScore(deck.id).then(bestScore => {
+                            const bestScoreHtml = bestScore !== null ? 
+                                `<div class="best-score">Best score: ${bestScore}%</div>` : 
+                                '';
+                            
+                            const deckElement = document.createElement('div');
+                            deckElement.className = 'deck-item';
+                            deckElement.innerHTML = `
+                                <div class="deck-header">
+                                    <div class="deck-title">${deck.name}</div>
+                                    <div class="deck-stats">
+                                        <i class="fas fa-layer-group"></i> ${deck.cards ? deck.cards.length : 0} cards
+                                    </div>
+                                </div>
+                                <div class="deck-content">
+                                    ${bestScoreHtml}
+                                    <div class="deck-actions">
+                                        <button class="deck-action-button action-edit" onclick="editDeck('${deck.id}')">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="deck-action-button action-delete" onclick="confirmDeleteDeck('${deck.id}', '${deck.name}')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                        <button class="deck-action-button action-play" onclick="playDeck('${deck.id}')">
+                                            <i class="fas fa-play"></i> Play
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            userDecksContainer.appendChild(deckElement);
+                        });
+                    });
+                    
+                    return Promise.all(renderPromises);
+                })
+                .catch(error => {
+                    console.error("Error loading user decks from Firestore:", error);
+                    
+                    // Fallback to localStorage
+                    const allDecks = JSON.parse(localStorage.getItem('memo-decks')) || [];
+                    const userDecks = allDecks.filter(deck => 
+                        deck.userId === currentUser.id && !defaultDeckNames.includes(deck.name)
+                    );
+                    
+                    // Clear container
+                    userDecksContainer.innerHTML = '';
+                    
+                    if (userDecks.length === 0) {
+                        // Display message when no decks exist
+                        userDecksContainer.innerHTML = `
+                            <div class="no-decks-message">
+                                <p>You don't have any created decks yet.</p>
+                                <p>Create your first deck to get started!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Sort decks by creation date (newest first)
+                    userDecks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    
+                    // Create deck items
+                    userDecks.forEach(deck => {
+                        // Get best score if available
+                        getBestScore(deck.id).then(bestScore => {
+                            const bestScoreHtml = bestScore !== null ? 
+                                `<div class="best-score">Best score: ${bestScore}%</div>` : 
+                                '';
+                            
+                            const deckElement = document.createElement('div');
+                            deckElement.className = 'deck-item';
+                            deckElement.innerHTML = `
+                                <div class="deck-header">
+                                    <div class="deck-title">${deck.name}</div>
+                                    <div class="deck-stats">
+                                        <i class="fas fa-layer-group"></i> ${deck.cards.length} cards
+                                    </div>
+                                </div>
+                                <div class="deck-content">
+                                    ${bestScoreHtml}
+                                    <div class="deck-actions">
+                                        <button class="deck-action-button action-edit" onclick="editDeck('${deck.id}')">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="deck-action-button action-delete" onclick="confirmDeleteDeck('${deck.id}', '${deck.name}')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                        <button class="deck-action-button action-play" onclick="playDeck('${deck.id}')">
+                                            <i class="fas fa-play"></i> Play
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            userDecksContainer.appendChild(deckElement);
+                        });
+                    });
+                });
+        }
+        
+        // Mevcut playDeck fonksiyonunu şöyle güncelleyin
+        function playDeck(deckId, encodedDeckName = '') {
+            console.log("Play Deck called with:", { deckId, encodedDeckName });
+            
+            // localStorage'dan desteler alınır
+            const decks = JSON.parse(localStorage.getItem('memo-decks')) || [];
+            
+            // ID'ye göre deste aranır
+            let deck = decks.find(d => d.id === deckId);
+            
+            if (deck) {
+                // Eğer deste bulunursa, normal şekilde yönlendir
+                console.log("Found deck by ID in localStorage:", deck);
+                goToPage(`practice.html?deck=${encodeURIComponent(deckId)}`);
+            } else if (encodedDeckName) {
+                // ID bulunamadıysa ve bir deste adı sağlanmışsa
+                const deckName = decodeURIComponent(encodedDeckName);
+                console.log("Looking for deck by name:", deckName);
+                
+                // Bu bir varsayılan deste olabilir
+                console.log("Using name parameter for default deck");
+                goToPage(`practice.html?default_deck=${encodedDeckName}`);
+            } else {
+                // Normal deste ID'si ile yönlendir (geriye dönük uyumluluk için)
+                console.log("No deck name provided, using ID directly");
+                goToPage(`practice.html?deck=${encodeURIComponent(deckId)}`);
+            }
+        }
+                
+        // Edit a deck
+        function editDeck(deckId) {
+            // Redirect to edit page with deck ID
+            goToPage(`new-card.html?deck=${deckId}`);
+        }
+        
+        // Show confirmation dialog for deck deletion
+        function confirmDeleteDeck(deckId, deckName) {
+            const dialogOverlay = document.getElementById('dialogOverlay');
+            const dialogMessage = document.getElementById('dialogMessage');
+            const confirmButton = document.getElementById('confirmButton');
+            
+            dialogMessage.textContent = `Are you sure you want to delete "${deckName}"? This can't be undone.`;
+            dialogOverlay.style.display = 'flex';
+            
+            // Set up confirm button action
+            confirmButton.onclick = function() {
+                deleteDeck(deckId);
+                closeDialog();
+            };
+        }
+        
+        // Close confirmation dialog
+        function closeDialog() {
+            document.getElementById('dialogOverlay').style.display = 'none';
+        }
+        
+        // Delete a deck
+        function deleteDeck(deckId) {
+            // Delete from Firestore
+            db.collection('decks').doc(deckId).delete()
+                .then(() => {
+                    console.log("Deck deleted from Firestore");
+                    
+                    // Also delete from localStorage
+                    let decks = JSON.parse(localStorage.getItem('memo-decks')) || [];
+                    decks = decks.filter(deck => deck.id !== deckId);
+                    localStorage.setItem('memo-decks', JSON.stringify(decks));
+                    
+                    // Reload decks list
+                    loadUserDecks();
+                })
+                .catch(error => {
+                    console.error("Error deleting deck from Firestore:", error);
+                    
+                    // Fallback to localStorage only
+                    let decks = JSON.parse(localStorage.getItem('memo-decks')) || [];
+                    decks = decks.filter(deck => deck.id !== deckId);
+                    localStorage.setItem('memo-decks', JSON.stringify(decks));
+                    
+                    // Reload decks list
+                    loadUserDecks();
+                });
+        }
+        
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                overlay.style.display = 'block';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                }, 10);
+            } else {
+                overlay.style.opacity = '0';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // Function to navigate to another page
+        function goToPage(url) {
+            window.location.href = url;
+        }
+        
+        // Load decks when page loads
+        window.onload = function() {
+            loadDecks();
+        };
+    </script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Yapılandırma -->
+    <script>
+    // Firebase projenizin yapılandırması
+    const firebaseConfig = {
+        apiKey: "AIzaSyBa0oIiq9e-NFbn4-mhVTL6OQjBeNxFhcs",
+        authDomain: "memo-web-75603.firebaseapp.com",
+        projectId: "memo-web-75603",
+        storageBucket: "memo-web-75603.firebasestorage.app",
+        messagingSenderId: "962592461391",
+        appId: "1:962592461391:web:58cf3507582dc46fba903a",
+        measurementId: "G-BPJY5XR1TS"
+    };
+    
+    // Firebase'i başlat
+    firebase.initializeApp(firebaseConfig);
+    
+    // Auth ve Firestore referanslarını al
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Çevrimdışı veri desteğini etkinleştir
+    db.enablePersistence()
+        .then(() => {
+        console.log("Offline persistence enabled");
+        })
+        .catch((err) => {
+        if (err.code == 'failed-precondition') {
+            // Birden fazla sekme açıksa, persistence sadece bir sekmede etkinleştirilebilir
+            console.warn("Persistence failed: Multiple tabs open");
+        } else if (err.code == 'unimplemented') {
+            // Tarayıcı desteklemiyorsa
+            console.warn("Persistence not supported by browser");
+        }
+        });
+        
+    </script>
+    <script>
+        // Import Dialog için global değişkenler
+    let parsedCards = [];
+    let importedDeckName = '';
+    let importFormat = 'auto';
+
+    // Import Dialog'u göster
+    function showImportDialog() {
+        const importDialogOverlay = document.getElementById('importDialogOverlay');
+        if (importDialogOverlay) {
+            importDialogOverlay.style.display = 'flex';
+            
+            // Reset form
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileFormatSelect').value = 'auto';
+            document.getElementById('importPreviewContainer').style.display = 'none';
+            document.getElementById('importButton').disabled = true;
+            parsedCards = [];
+            importedDeckName = '';
+        }
+    }
+
+    // Import Dialog'u kapat
+    function closeImportDialog() {
+        const importDialogOverlay = document.getElementById('importDialogOverlay');
+        if (importDialogOverlay) {
+            importDialogOverlay.style.display = 'none';
+        }
+    }
+
+    // Import formatını değiştir
+    function changeImportFormat() {
+        importFormat = document.getElementById('fileFormatSelect').value;
+        
+        // Dosya seçiliyse yeniden önizleme yapalım
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput.files.length > 0) {
+            previewImport();
+        }
+    }
+
+    // Dosya önizlemesi
+    function previewImport() {
+        const fileInput = document.getElementById('fileInput');
+        const formatSelect = document.getElementById('fileFormatSelect');
+        const previewContainer = document.getElementById('importPreviewContainer');
+        const previewElement = document.getElementById('importPreview');
+        const cardCountElement = document.getElementById('previewCardCount');
+        const importButton = document.getElementById('importButton');
+        
+        if (fileInput.files.length === 0) {
+            alert('Please select a file first.');
+            return;
+        }
+        
+        const file = fileInput.files[0];
+        importedDeckName = file.name.replace('.txt', '');
+        importFormat = formatSelect.value;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            
+            // Parse cards based on format
+            parsedCards = parseFlashcards(content, importFormat);
+            
+            // Show preview
+            if (parsedCards.length > 0) {
+                previewContainer.style.display = 'block';
+                previewElement.innerHTML = '';
+                
+                // Just show first 5 cards in preview
+                const previewCards = parsedCards.slice(0, 5);
+                previewCards.forEach(card => {
+                    const cardElement = document.createElement('div');
+                    cardElement.className = 'preview-card';
+                    cardElement.innerHTML = `
+                        <div class="preview-card-front">${escapeHtml(card.front)}</div>
+                        <div class="preview-card-back">${escapeHtml(card.back)}</div>
+                    `;
+                    previewElement.appendChild(cardElement);
+                });
+                
+                if (parsedCards.length > 5) {
+                    const moreElement = document.createElement('div');
+                    moreElement.textContent = `...and ${parsedCards.length - 5} more cards`;
+                    moreElement.style.textAlign = 'center';
+                    moreElement.style.fontStyle = 'italic';
+                    moreElement.style.marginTop = '10px';
+                    previewElement.appendChild(moreElement);
+                }
+                
+                cardCountElement.textContent = parsedCards.length;
+                importButton.disabled = false;
+            } else {
+                previewContainer.style.display = 'block';
+                previewElement.innerHTML = '<div style="color: red;">No valid flashcards found in the file. Please check the format and try again.</div>';
+                cardCountElement.textContent = '0';
+                importButton.disabled = true;
+            }
+        };
+        
+        reader.readAsText(file);
+    }
+
+    // Flashcard'ları parse et
+    function parseFlashcards(content, format) {
+        // HTML etiketlerini temizle
+        let isHtml = false;
+        if (content.includes('#html:true')) {
+            isHtml = true;
+        }
+        
+        // Dosya başlığında format belirtisi var mı kontrol et
+        if (content.includes('#separator:tab')) {
+            format = 'tab';
+        }
+        
+        // Satırlara böl
+        const lines = content.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+        
+        const cards = [];
+        
+        // Format'a göre parse işlemi
+        if (format === 'tab' || (format === 'auto' && content.includes('\t'))) {
+            // Tab-separated format
+            for (const line of lines) {
+                if (line.includes('\t')) {
+                    const [front, back] = line.split('\t').map(part => part.trim());
+                    if (front && back) {
+                        cards.push({
+                            front: isHtml ? stripHtml(front) : front,
+                            back: isHtml ? stripHtml(back) : back
+                        });
+                    }
+                }
+            }
+        } else if (format === 'colon' || (format === 'auto' && lines.some(line => line.includes(':')))) {
+            // Colon-separated format
+            for (const line of lines) {
+                if (line.includes(':')) {
+                    const [front, back] = line.split(':').map(part => part.trim());
+                    if (front && back) {
+                        cards.push({
+                            front: isHtml ? stripHtml(front) : front,
+                            back: isHtml ? stripHtml(back) : back
+                        });
+                    }
+                }
+            }
+        } else if (format === 'line' || format === 'auto') {
+            // Line-separated format (front and back on alternate lines)
+            for (let i = 0; i < lines.length - 1; i += 2) {
+                const front = lines[i];
+                const back = lines[i + 1];
+                if (front && back) {
+                    cards.push({
+                        front: isHtml ? stripHtml(front) : front,
+                        back: isHtml ? stripHtml(back) : back
+                    });
+                }
+            }
+        }
+        
+        return cards;
+    }
+
+    // HTML öğelerini temizler
+    function stripHtml(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || '';
+    }
+
+    // HTML özel karakterlerini encode eder (XSS koruması)
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Flashcard'ları import et
+    function importFlashcards() {
+        if (parsedCards.length === 0) {
+            alert('No valid flashcards found to import.');
+            return;
+        }
+        
+        if (!currentUser) {
+            alert('You need to be logged in to import flashcards.');
+            return;
+        }
+        
+        // Create a new deck
+        const newDeck = {
+            id: 'deck-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+            userId: currentUser.id,
+            name: importedDeckName || 'Imported Deck',
+            description: `Imported from text file on ${new Date().toLocaleDateString()}`,
+            createdAt: new Date().toISOString(),
+            cards: parsedCards.map(card => ({
+                id: 'card-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+                front: card.front,
+                back: card.back,
+                createdAt: new Date().toISOString()
+            }))
+        };
+        
+        // Save deck to localStorage
+        const decks = JSON.parse(localStorage.getItem('memo-decks')) || [];
+        decks.push(newDeck);
+        localStorage.setItem('memo-decks', JSON.stringify(decks));
+        
+        // If Firebase is available, save there too
+        // If Firebase is available, save there too
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            db.collection('decks').doc(newDeck.id).set(newDeck)
+                .then(() => {
+                    console.log('Deck saved to Firestore');
+                })
+                .catch(error => {
+                    console.error('Error saving to Firestore:', error);
+                });
+        }
+
+        alert(`Successfully imported ${parsedCards.length} flashcards!`);
+        closeImportDialog();
+        loadUserDecks(); // Refresh the user's deck list
+        }
+
+        // Event listener'ları ekle
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format seçimi değiştiğinde önizlemeyi güncelle
+            const formatSelect = document.getElementById('fileFormatSelect');
+            if (formatSelect) {
+                formatSelect.addEventListener('change', changeImportFormat);
+            }
+
+        });
+    </script>
+    <script src="firebase-auth.js"></script>
+    <script src="firebase-decks.js"></script>
+</body>
+</html>

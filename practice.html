@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice - Memo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <link rel="stylesheet" href="./practice.css">
+</head>
+<body>
+    <!-- Practice Page -->
+    <div class="practice-page">
+        <div class="header">
+            <div class="menu-icon" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+            <div class="home-icon" onclick="goToPage('index.html')"><i class="fas fa-home"></i></div>
+        </div>
+        <div class="content">
+            <h1 class="page-title">Practice</h1>
+            <div class="deck-name" id="deckName">Loading deck...</div>
+            
+            <!-- Practice Session View -->
+            <div id="practiceView">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="counters">
+                    <div class="card-counter">
+                        <i class="fas fa-layer-group"></i>
+                        <span id="cardCounter">Card 0/0</span>
+                    </div>
+                    <div class="score-counter">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="scoreCounter">Correct: 0</span>
+                    </div>
+                </div>
+                
+                <div class="card-instruction">Tap the card to flip it</div>
+                
+                <div class="card-container">
+                    <div class="card" id="flashcard" onclick="flipCard()">
+                        <div class="card-face card-front">
+                            <div class="card-content" id="cardFront">Loading cards...</div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div class="card-content" id="cardBack"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons-container" id="answerButtons">
+                    <button class="practice-button btn-wrong" onclick="markAnswer(false)">
+                        <i class="fas fa-times"></i> Wrong
+                    </button>
+                    <button class="practice-button btn-neutral" onclick="skipCard()">
+                        <i class="fas fa-forward"></i> Skip
+                    </button>
+                    <button class="practice-button btn-correct" onclick="markAnswer(true)">
+                        <i class="fas fa-check"></i> Correct
+                    </button>
+                    <!-- Yeni Çıkış Butonu -->
+                    <button class="practice-button btn-exit" onclick="confirmExit()">
+                        <i class="fas fa-sign-out-alt"></i> Exit
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results View -->
+            <div id="resultsView" class="results-container">
+                <div class="results-title">Practice Results</div>
+                <div class="results-score" id="finalScore">0%</div>
+                
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCards">0</div>
+                        <div class="stat-label">Total Cards</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="correctAnswers">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="wrongAnswers">0</div>
+                        <div class="stat-label">Wrong</div>
+                    </div>
+                </div>
+                
+                <div class="results-buttons">
+                    <button class="practice-button btn-neutral" onclick="restartPractice()">
+                        <i class="fas fa-redo"></i> Restart
+                    </button>
+                    <button class="practice-button btn-finish" onclick="goToPage('my-decks.html')">
+                        <i class="fas fa-layer-group"></i> Back to Decks
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Çıkış Onay Kutusu -->
+    <div class="exit-confirm-overlay" id="exitConfirmOverlay">
+        <div class="exit-confirm-box">
+            <div class="exit-confirm-title">Exit Practice</div>
+            <div class="exit-confirm-message">Data is not saved. Are you sure you want to quit?</div>
+            <div class="exit-confirm-buttons">
+                <button class="exit-confirm-button cancel" onclick="cancelExit()">No, Continue</button>
+                <button class="exit-confirm-button confirm" onclick="exitPractice()">Yes, Exit</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar and Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <div class="sidebar-close" onclick="toggleSidebar()"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="sidebar-menu">
+            <div class="sidebar-item" onclick="goToPage('index.html')">
+                <i class="fas fa-home"></i> Home
+            </div>
+            <div class="sidebar-item" onclick="goToPage('new-card.html')">
+                <i class="fas fa-plus"></i> New Deck
+            </div>
+            <div class="sidebar-item" onclick="goToPage('my-decks.html')">
+                <i class="fas fa-layer-group"></i> My Decks
+            </div>
+            <div class="sidebar-item" onclick="goToPage('about.html')">
+                <i class="fas fa-info-circle"></i> About
+            </div>
+            <div class="sidebar-item" onclick="goToPage('settings.html')">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+            <div class="sidebar-item" onclick="goToPage('account.html')">
+                <i class="fas fa-user"></i> Account
+            </div>
+        </div>
+    </div>
+    <script src="default-decks.js"></script>
+    <script src="auth-check.js"></script>
+    <script src="theme-loader.js"></script>
+    <script>
+        // Practice session variables
+        let currentDeck = null;
+        let shuffledCards = [];
+        let currentCardIndex = 0;
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let skippedCards = [];
+        let practiceStartTime = null;
+        let currentUser = null;
+        let isProcessingAction = false; // Flag to prevent multiple button clicks
+
+        window.onload = function() {
+            console.log("Practice page loaded");
+            console.log("URL Parameters:", window.location.search);
+            
+            // Try to get user from localStorage first (for compatibility)
+            currentUser = JSON.parse(localStorage.getItem('memo-current-user')) || 
+                        JSON.parse(sessionStorage.getItem('memo-current-user')) || 
+                        { id: 'guest' };
+            
+            // Get deck ID or default deck name from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const deckId = urlParams.get('deck');
+            const defaultDeckName = urlParams.get('default_deck');
+            
+            console.log("Deck ID from URL:", deckId);
+            console.log("Default Deck Name from URL:", defaultDeckName);
+            
+            if (!deckId && !defaultDeckName) {
+                console.error("No deck specified");
+                alert('No deck specified. Redirecting to decks page.');
+                goToPage('my-decks.html');
+                return;
+            }
+            
+            // Log localStorage decks for debugging
+            const decks = JSON.parse(localStorage.getItem('memo-decks')) || [];
+            console.log("Decks in localStorage:", decks);
+            
+            // Debug: Log global defaultDecks
+            if (window.defaultDecks) {
+                console.log("Global defaultDecks:", window.defaultDecks);
+            } else {
+                console.log("Global defaultDecks not found!");
+            }
+            
+            // Handle default deck name parameter
+            if (defaultDeckName) {
+                const decodedDeckName = decodeURIComponent(defaultDeckName);
+                console.log("Looking for default deck:", decodedDeckName);
+                
+                // First try localStorage by name
+                currentDeck = decks.find(deck => deck.name === decodedDeckName);
+                
+                if (currentDeck) {
+                    console.log("Default deck found by name in localStorage:", currentDeck);
+                    document.getElementById('deckName').textContent = currentDeck.name;
+                    initializePractice();
+                    return;
+                }
+                
+                // Then try global defaultDecks
+                if (window.defaultDecks && Array.isArray(window.defaultDecks)) {
+                    const defaultDeckTemplate = window.defaultDecks.find(deck => deck.name === decodedDeckName);
+                    
+                    if (defaultDeckTemplate) {
+                        // Create temporary deck from template
+                        currentDeck = {
+                            id: 'temp-deck-' + Date.now(),
+                            name: defaultDeckTemplate.name,
+                            description: defaultDeckTemplate.description || '',
+                            cards: Array.isArray(defaultDeckTemplate.cards) 
+                                ? defaultDeckTemplate.cards.map(card => ({
+                                    id: 'card-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+                                    front: card.front,
+                                    back: card.back
+                                }))
+                                : []
+                        };
+                        
+                        console.log("Created temporary deck from global defaultDecks:", currentDeck);
+                        document.getElementById('deckName').textContent = currentDeck.name;
+                        initializePractice();
+                        return;
+                    }
+                }
+                
+                // Try Firebase as last resort
+                if (typeof firebase !== 'undefined' && firebase.firestore) {
+                    const db = firebase.firestore();
+                    console.log("Trying to fetch default deck from Firestore by name");
+                    
+                    db.collection('decks')
+                        .where('name', '==', decodedDeckName)
+                        .limit(1)
+                        .get()
+                        .then(querySnapshot => {
+                            if (!querySnapshot.empty) {
+                                currentDeck = querySnapshot.docs[0].data();
+                                currentDeck.id = querySnapshot.docs[0].id;
+                                console.log("Found default deck in Firestore by name:", currentDeck);
+                                document.getElementById('deckName').textContent = currentDeck.name;
+                                initializePractice();
+                            } else {
+                                console.error("Default deck not found in Firestore by name");
+                                alert('Default deck not found. Redirecting to decks page.');
+                                goToPage('my-decks.html');
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error fetching default deck from Firestore:", error);
+                            alert('Error loading deck. Redirecting to decks page.');
+                            goToPage('my-decks.html');
+                        });
+                } else {
+                    console.error("Firebase not available and deck not found locally");
+                    alert('Default deck not found. Redirecting to decks page.');
+                    goToPage('my-decks.html');
+                }
+            } else if (deckId) {
+                // Handle regular deck ID parameter
+                currentDeck = decks.find(deck => deck.id === deckId);
+                console.log("Deck found in localStorage by ID:", currentDeck);
+                
+                if (currentDeck) {
+                    document.getElementById('deckName').textContent = currentDeck.name;
+                    initializePractice();
+                } else if (typeof firebase !== 'undefined' && firebase.firestore) {
+                    // Try Firebase
+                    const db = firebase.firestore();
+                    console.log("Attempting to fetch deck from Firestore by ID");
+                    
+                    db.collection('decks').doc(deckId).get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                currentDeck = doc.data();
+                                currentDeck.id = doc.id;
+                                console.log("Fetched deck from Firestore by ID:", currentDeck);
+                                document.getElementById('deckName').textContent = currentDeck.name;
+                                initializePractice();
+                            } else {
+                                console.error("Deck not found in Firestore by ID");
+                                alert('Deck not found. Redirecting to decks page.');
+                                goToPage('my-decks.html');
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error fetching deck from Firestore:", error);
+                            alert('Error loading deck. Redirecting to decks page.');
+                            goToPage('my-decks.html');
+                        });
+                } else {
+                    console.error("Deck not found and Firebase not available");
+                    alert('Deck not found. Redirecting to decks page.');
+                    goToPage('my-decks.html');
+                }
+            }
+        };
+
+        // Global defaultDecks'ten desteyi alma fonksiyonu
+        function checkGlobalDefaultDecks(deckName) {
+            // global defaultDecks değişkenine eriş
+            if (window.defaultDecks && Array.isArray(window.defaultDecks)) {
+                // isimle eşleşen desteyi bul
+                const deckTemplate = window.defaultDecks.find(deck => deck.name === deckName);
+                
+                if (deckTemplate) {
+                    // Geçici deste oluştur
+                    currentDeck = {
+                        id: 'temp-deck-' + Date.now(),
+                        name: deckTemplate.name,
+                        description: deckTemplate.description,
+                        cards: deckTemplate.cards.map(card => ({
+                            id: 'card-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+                            front: card.front,
+                            back: card.back
+                        }))
+                    };
+                    
+                    console.log("Created temp deck from global defaultDecks:", currentDeck);
+                    document.getElementById('deckName').textContent = currentDeck.name;
+                    initializePractice();
+                    return;
+                }
+            }
+            
+            // Hiçbir şekilde bulunamadı
+            console.error("Default deck not found anywhere");
+            alert('Default deck not found. Redirecting to decks page.');
+            goToPage('my-decks.html');
+        }
+
+        // Initialize practice session
+        function initializePractice() {
+            // Set start time for practice session
+            practiceStartTime = new Date();
+            
+            // Hide results view, show practice view
+            document.getElementById('practiceView').style.display = 'block';
+            document.getElementById('resultsView').style.display = 'none';
+            
+            // Reset counters
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            currentCardIndex = 0;
+            skippedCards = [];
+            isProcessingAction = false;
+            
+            // Shuffle cards
+            shuffledCards = [...currentDeck.cards];
+            shuffleArray(shuffledCards);
+            
+            // Update UI
+            updateCardCounter();
+            updateScoreCounter();
+            updateProgressBar();
+            
+            // Load first card
+            showCard(shuffledCards[0]);
+        }
+
+        // Shuffle array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Display card content
+        function showCard(card) {
+            if (!card) return;
+            
+            const cardFront = document.getElementById('cardFront');
+            const cardBack = document.getElementById('cardBack');
+            const flashcard = document.getElementById('flashcard');
+            
+            // Reset card to front face
+            flashcard.classList.remove('flipped');
+            
+            // Set card content
+            cardFront.textContent = card.front;
+            cardBack.textContent = card.back;
+            
+            // Reset processing flag when showing a new card
+            isProcessingAction = false;
+        }
+
+        // Flip card to reveal answer
+        function flipCard() {
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.toggle('flipped');
+        }
+
+        // Record user answer and move to next card
+        function markAnswer(isCorrect) {
+            // Prevent multiple rapid clicks
+            if (isProcessingAction) return;
+            isProcessingAction = true;
+            
+            // Only count if card hasn't been skipped
+            if (!skippedCards.includes(currentCardIndex)) {
+                if (isCorrect) {
+                    correctAnswers++;
+                } else {
+                    wrongAnswers++;
+                }
+            }
+            
+            // Remove from skipped if it was skipped before
+            skippedCards = skippedCards.filter(idx => idx !== currentCardIndex);
+            
+            // Move to next card
+            nextCard();
+        }
+
+        // Skip current card (will be shown again later)
+        function skipCard() {
+            // Prevent multiple rapid clicks
+            if (isProcessingAction) return;
+            isProcessingAction = true;
+            
+            // Add current card index to skipped cards if not already there
+            if (!skippedCards.includes(currentCardIndex)) {
+                skippedCards.push(currentCardIndex);
+            }
+            
+            // Move to next card
+            nextCard();
+        }
+
+        // Move to next card or end practice
+        function nextCard() {
+            currentCardIndex++;
+            
+            // Update UI first for better user experience
+            updateCardCounter();
+            updateScoreCounter();
+            updateProgressBar();
+            
+            // If all cards have been answered or maximum skips reached
+            if (currentCardIndex >= shuffledCards.length || 
+                (correctAnswers + wrongAnswers) >= shuffledCards.length) {
+                // Show results
+                showResults();
+                return;
+            }
+            
+            // Show next card (this will also reset isProcessingAction)
+            setTimeout(() => {
+                showCard(shuffledCards[currentCardIndex]);
+            }, 300); // Short delay for better UX
+        }
+
+        // Update card counter display
+        function updateCardCounter() {
+            const totalCards = shuffledCards.length;
+            document.getElementById('cardCounter').textContent = `Card ${currentCardIndex + 1}/${totalCards}`;
+        }
+
+        // Update score counter display
+        function updateScoreCounter() {
+            document.getElementById('scoreCounter').textContent = `Correct: ${correctAnswers}`;
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const totalCards = shuffledCards.length;
+            const answeredCards = correctAnswers + wrongAnswers;
+            const progressPercent = (answeredCards / totalCards) * 100;
+            
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+        }
+
+        // Calculate time spent during practice session
+        function calculateTimeSpent() {
+            if (!practiceStartTime) {
+                return "N/A";
+            }
+            
+            const endTime = new Date();
+            const timeSpentMs = endTime - practiceStartTime;
+            
+            // Format as minutes and seconds
+            const minutes = Math.floor(timeSpentMs / 60000);
+            const seconds = Math.floor((timeSpentMs % 60000) / 1000);
+            
+            return `${minutes}m ${seconds}s`;
+        }
+
+        // Save practice history to localStorage (and Firestore if available)
+        function savePracticeHistory() {
+            if (!currentUser) return; // Skip if no user is logged in
+            
+            // Create practice session data
+            const practiceSession = {
+                id: 'practice-' + Date.now(),
+                userId: currentUser.id,
+                deckId: currentDeck.id,
+                deckName: currentDeck.name,
+                date: new Date().toISOString(),
+                totalCards: shuffledCards.length,
+                correctAnswers: correctAnswers,
+                wrongAnswers: wrongAnswers,
+                timeSpent: calculateTimeSpent()
+            };
+            
+            // Save to localStorage (always do this for compatibility)
+            const practiceHistory = JSON.parse(localStorage.getItem(`memo-practice-history-${currentUser.id}`)) || [];
+            practiceHistory.push(practiceSession);
+            localStorage.setItem(`memo-practice-history-${currentUser.id}`, JSON.stringify(practiceHistory));
+            
+            // If Firebase is available, also save there
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                const db = firebase.firestore();
+                db.collection('practice-history').add(practiceSession)
+                    .then(() => {
+                        console.log("Practice history saved to Firestore");
+                    })
+                    .catch(error => {
+                        console.error("Error saving to Firestore:", error);
+                    });
+            }
+        }
+
+        // Show practice results
+        function showResults() {
+            const totalCards = shuffledCards.length;
+            const scorePercent = Math.round((correctAnswers / totalCards) * 100);
+            
+            // Save practice results
+            savePracticeHistory();
+            
+            // Update results view
+            document.getElementById('finalScore').textContent = `${scorePercent}%`;
+            document.getElementById('totalCards').textContent = totalCards;
+            document.getElementById('correctAnswers').textContent = correctAnswers;
+            document.getElementById('wrongAnswers').textContent = wrongAnswers;
+            
+            // Hide practice view, show results view
+            document.getElementById('practiceView').style.display = 'none';
+            document.getElementById('resultsView').style.display = 'flex';
+        }
+
+        // Restart practice session
+        function restartPractice() {
+            initializePractice();
+        }
+
+        // Çıkış onayı gösterme fonksiyonu
+        function confirmExit() {
+            document.getElementById('exitConfirmOverlay').style.display = 'flex';
+        }
+
+        // Çıkışı iptal etme fonksiyonu
+        function cancelExit() {
+            document.getElementById('exitConfirmOverlay').style.display = 'none';
+        }
+
+        // Pratikten çıkış fonksiyonu
+        function exitPractice() {
+            // Çıkış yapılıyor, kullanıcıyı desteler sayfasına yönlendir
+            goToPage('my-decks.html');
+        }
+
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                overlay.style.display = 'block';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                }, 10);
+            } else {
+                overlay.style.opacity = '0';
+                // Add small delay for smooth transition
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Function to navigate to another page
+        function goToPage(url) {
+            window.location.href = url;
+        }
+    </script>
+    
+    <!-- Conditionally load Firebase if it's not loaded yet -->
+    <script>
+        // Check if Firebase is already defined
+        if (typeof firebase === 'undefined') {
+            // Load Firebase scripts only if needed
+            const loadFirebase = document.createElement('script');
+            loadFirebase.text = `
+                // Load Firebase scripts here
+                console.log("Firebase not detected, using localStorage only");
+            `;
+            document.body.appendChild(loadFirebase);
+        }
+    </script>
+</body>
+</html>
